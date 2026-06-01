@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const PREGUNTAS = [
   {
@@ -150,12 +150,24 @@ function btnStyle(bg) {
 
 export default function App() {
   const [vista, setVista] = useState("menu"); // menu | entrevista | tabla
-  const [candidatas, setCandidatas] = useState([]);
+  const [candidatas, setCandidatas] = useState(() => {
+    try {
+      const saved = localStorage.getItem("entrevistas-cuidadoras");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [actual, setActual] = useState(null); // índice en edición
   const [timerRunning, setTimerRunning] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [timerRef, setTimerRef] = useState(null);
   const [categoriaActiva, setCategoriaActiva] = useState(0);
+
+  // Guardar en localStorage cada vez que cambien las candidatas
+  useEffect(() => {
+    localStorage.setItem("entrevistas-cuidadoras", JSON.stringify(candidatas));
+  }, [candidatas]);
 
   function nuevaCandidata() {
     const c = {
